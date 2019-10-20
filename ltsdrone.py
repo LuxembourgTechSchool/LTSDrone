@@ -30,7 +30,7 @@ class LTSDrone():
         self.response_last_update = None
         self.response = None # Store the last command response
         self.state_last_update = None
-        self.state = {} # Store the last states
+        self.states = {} # Store the last states
 
         self.tello_address = (tello_ip, self.TELLO_COMMAND_PORT)
         self.local_state_port = self.TELLO_STATE_PORT
@@ -88,8 +88,8 @@ class LTSDrone():
                     data = data.decode(encoding="utf-8")
                     if ';' in data:
                         states = data.replace(';\r\n','').split(';')
-                        #self.state = {s.split(':')[0]:s.split(':')[1] for s in states}
-                        self.states = states
+                        self.states = {s.split(':')[0]:s.split(':')[1] for s in states}
+                        #self.states = states
                 
                 self.state_last_update = datetime.datetime.now() # Put in last if
                 time.sleep(self.state_interval)
@@ -159,7 +159,7 @@ class LTSDrone():
         '''
         return self.send_command('streamoff')
 
-    def start_mission_detect(self, mdirection=2):
+    def start_mission_detect(self, mdirection=0):
         ''' Start the Mission Pad detection.
         Args:
             mdirection (int): The Mission Pad direction detection mode
@@ -172,7 +172,7 @@ class LTSDrone():
         response_mon = self.send_command('mon')
         response_mdirection = self.send_command('mdirection {}'.format(mdirection))
 
-    def stop_mission_detect(self, mdirection=2):
+    def stop_mission_detect(self):
         ''' Stops the Mission Pad detection.
         Returns:
             str: Response from Tello, 'OK' or 'FALSE'.
@@ -187,7 +187,7 @@ class LTSDrone():
             str: Response from Tello, 'OK' or 'FALSE'.
         '''
         speed = max(speed, 10)
-        speed = min(speed, 100)
+        speed = min(speed, 70)
         return self.send_command('speed {}'.format(speed))
 
     # Tello Flight Commands
@@ -398,7 +398,7 @@ class LTSDrone():
             pass
         return speed
 
-    def get_last_state(self):
+    def get_last_states(self):
         ''' Return the latest state as a dictionary.
         - mid  = the ID of the Mission Pad detected. If no Mission Pad is detected, a -1 message will be received instead.
         - x    = the x coordinate detected on the Mission Pad. If there is no Mission Pad, a 0 message will be received instead.
@@ -422,7 +422,7 @@ class LTSDrone():
         - agz    = the acceleration of the z axis.
         '''
         print(self.state_last_update)
-        return self.state
+        return self.states
 
 
     def get_height(self):

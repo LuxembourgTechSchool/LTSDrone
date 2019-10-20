@@ -1,5 +1,6 @@
 from ltsdrone import LTSDrone
 import os
+from time import sleep
 
 def drone_print(response):
     print('[Drone] {}'.format(response))
@@ -12,27 +13,35 @@ def report(message):
         os.system('say ' + message)
 
 def demo(drone):
-    report("Let's go!")
+    report('Demo is starting.')
+
+    delay = 5
 
     r = drone.takeoff()
     drone_print(r)
+    sleep(delay)
 
-    r = drone.up(50)
+    r = drone.move_up(50)
     drone_print(r)
+    sleep(delay)
 
     # Square without rotation
 
-    r = drone.forward(100)
+    r = drone.move_forward(100)
     drone_print(r)
+    sleep(delay)
 
-    r = drone.left(100)
+    r = drone.move_left(100)
     drone_print(r)
+    sleep(delay)
 
-    r = drone.back(100)
+    r = drone.move_backward(100)
     drone_print(r)
+    sleep(delay)
 
-    r = drone.right(100)
+    r = drone.move_right(100)
     drone_print(r)
+    sleep(delay)
 
     # Square with rotation
 
@@ -40,29 +49,36 @@ def demo(drone):
     for i in range(n):
         print('Debug: {}/{}'.format(i+1, n))
 
-        r = drone.forward(100)
+        r = drone.move_forward(100)
         drone_print(r)
+        sleep(delay)
 
         r = drone.rotate_ccw(90)
         drone_print(r)
+        sleep(delay)
+
+    # Land
+    
+    r = drone.land()
+    drone_print(r)
 
 
 def run():
     report('Running Demo Square.')
 
-    #drone = LTSDrone()
+    drone = LTSDrone()
 
     report('Type ENTER to command the drone...')
     input()
     report('Entering command mode...')
 
-    #response = drone.go()
-    #drone_print(response)
+    response = drone.go()
+    drone_print(response)
 
     report('Type ENTER to takeoff and start the demo...')
     input()
 
-    #demo(drone)
+    demo(drone)
 
     report('Demo Completed.')
 
